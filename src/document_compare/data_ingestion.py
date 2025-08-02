@@ -4,8 +4,8 @@ import fitz
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
-class DocumentComparator:
-    def __init__(self,base_dir):
+class DocumentIngestion:
+    def __init__(self,base_dir:str="data\\document_compare"):
         self.log = CustomLogger().get_logger(__name__)
         self.base_dir = Path(base_dir)
         self.base_dir.mkdir(parents=True, exist_ok=True)
@@ -16,7 +16,12 @@ class DocumentComparator:
         '''
         Delete specified files if they exist.'''
         try:
-            pass
+            if self.base_dir.exists() and self.base_dir.is_dir():
+                for file in self.base_dir.iterdir():
+                    if file.is_file():
+                        file.unlink()
+                        self.log.info("File deleted successfully", path=str(file))
+                self.log.info("Directory cleaned", directory=str(self.base_dir))
         except Exception as e:
             self.log.error(f"Error deleting existing file: {e}")
             raise DocumentPortalException("An error occurred while comparing documents", sys)
@@ -28,13 +33,23 @@ class DocumentComparator:
         try:
             self.delete_existing_files()
             self.log.info("Existing file deleted successfully ")
-            ref_path=
-            act_path=""
+            ref_path = self.base_dir/ reference_file.name
+            act_path = self.base_dir / actual_file.name
+            
             if not reference_file.name.endswith(".pdf") or not actual_file.name.endswith(".pdf"):
                 raise ValueError("Only PDF files are allowed for reference document.")
+            
+            with open(ref_path, "wb") as f:
+                f.write(reference_file.getbuffer())
+            
+            with open(act_path, "wb") as f:
+                f.write(actual_file.getbuffer())
+            
+            self.log.info("Files saved successfully", reference_file=ref_path, actual_file=act_path)    
+            return ref_path, act_path
         except Exception as e:
-            self.log.error(f"Error comparing documents: {e}")
-            raise DocumentPortalException("An error occurred while comparing documents", sys)
+            self.log.error(f"Error saving uplaoded files: {e}")
+            raise DocumentPortalException("An error occurred while saving uplaoded files", sys)
     
     def read_pdf(self,pdf_path: Path) -> str:
         """
@@ -56,3 +71,26 @@ class DocumentComparator:
         except Exception as e:
             self.log.error(f"Error comparing documents: {e}")
             raise DocumentPortalException("An error occurred while comparing documents", sys)
+
+    def combine_documents(self) -> str:
+        """
+        Combines the text from two PDF documents into a single string.
+        """
+        try:
+            content_dict = {}
+            doc_parts = []
+            
+            for filename in self.base_dir.iterdir():
+                if filename.is_file and filename.suffix.lower() == ".pdf":
+                    content_dict[filename.name] = self.read_pdf(filename)
+            
+            for filename, content in content_dict.items():
+                doc_parts.append(f"Document: {filename}\n{content}")
+
+            combined_text = "\n\n".join(doc_parts)
+            self.log.info("Documents combined successfully", count=len(doc_parts))
+            return combined_text
+        
+        except Exception as e:
+            self.log.error(f"Error combining documents: {e}")
+            raise DocumentPortalException("An error occurred while combining documents", sys)
