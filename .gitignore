@@ -4,4 +4,10 @@ document_portal.egg-info
 venv/
 __pycache__/
 logs/
+data/
+data_bkp/
+faiss_index/
+faiss_index_bkp/
+*.log
+*.sqlite3
 *.pyc
