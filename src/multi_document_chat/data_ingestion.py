@@ -10,7 +10,7 @@ from exception.custom_exception import DocumentPortalException
 from utils.model_loader import ModelLoader
 class DocumentIngestor:
     SUPPORTED_EXTENSIONS = {'.pdf', '.docx', '.txt', '.md'}
-    def __init__(self, temp_dir:str = "data/multi_doc_chat",faiss_dir: str = "faiss_index", session_id: str | None = None):
+    def __init__(self, temp_dir:str = "data/multi_document_chat",faiss_dir: str = "faiss_index", session_id: str | None = None):
         try:
             self.log = CustomLogger().get_logger(__name__)
             
