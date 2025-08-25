@@ -79,6 +79,9 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: $IMAGE_URI
+      - name: Print Rendered Task
+        run: cat ${{ steps.render-task.outputs.task-definition }}
+          echo $IMAGE_URI
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
