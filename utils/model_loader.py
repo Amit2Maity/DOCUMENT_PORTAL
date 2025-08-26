@@ -5,16 +5,16 @@ from dotenv import load_dotenv
 from utils.config_loader import load_config
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
-from logger import GLOBAL_LOGGER as log
+from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
-
+log = CustomLogger().get_logger(__name__)
 
 class ApiKeyManager:
     REQUIRED_KEYS = ["GROQ_API_KEY", "GOOGLE_API_KEY"]
 
     def __init__(self):
         self.api_keys = {}
-        raw = os.getenv("API_KEYS")
+        raw = os.getenv("apikeyliveclass")
 
         if raw:
             try:
